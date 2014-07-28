@@ -82,7 +82,7 @@ def hummingget(start, finish):
         if poster_image:
             poster_image = poster_image.group(1)
         
-        db.query("""select hbid from malData where hbid = %s """),(id)
+        db.query("""select hbid from malData where hbid = """ + id)
         r = db.store_result()
         if r != id:
             if id != None:        
