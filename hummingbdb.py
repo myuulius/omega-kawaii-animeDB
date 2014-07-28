@@ -82,7 +82,7 @@ def hummingget(start, finish):
         if poster_image:
             poster_image = poster_image.group(1)
         
-        db.query("""select id from malData where id = %s """),(id)
+        db.query("""select hbid from malData where hbid = %s """),(id)
         r = db.store_result()
         if r != id:
             if id != None:        
@@ -91,4 +91,4 @@ def hummingget(start, finish):
             
                 db.commit()
         
-hummingget(1,20000)
+hummingget(1,50000)
