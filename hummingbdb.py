@@ -46,12 +46,13 @@ def hummingget(start, finish):
             synopsis = synopsis.group(1).replace("\\\"", "\"")
         else:
             synopsis = ""
-            
-        genres = re.search('"genres":(\[[^\]]*?\])', d)
-        if genres:
-            genres = genres.group(1)
-        else:
-            genres = ""
+        
+        ## Not using ##   
+        #genres = re.search('"genres":(\[[^\]]*?\])', d)
+        #if genres:
+        #    genres = genres.group(1)
+        #else:
+        #    genres = ""
             
         animetype = re.search('type":"([^"]*?)"', d)
         if animetype:
@@ -77,10 +78,14 @@ def hummingget(start, finish):
         episode_count = re.search('episode_count":(\d+)\D', d)
         if episode_count:
             episode_count = episode_count.group(1)
+        else:
+            episode_count = ""
             
         poster_image = re.search('poster_image":"([^"]*?)"', d)
         if poster_image:
             poster_image = poster_image.group(1)
+        else:
+            poster_image = ""
         
         db.query("""select hbid from malData where hbid = """ + id)
         r = db.store_result()
