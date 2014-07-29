@@ -84,8 +84,10 @@ def hummingget(start, finish):
         
         db.query("""select hbid from malData where hbid = """ + id)
         r = db.store_result()
-        if r != id:
-            if id != None:        
+        r = str(r.fetch_row())
+        r = re.search('\(\((\d+)\D*', r).group(1)
+        if id != None: 
+            if r != id:        
                 cur.execute("""
                     INSERT INTO malData (hbID, title, english_title, romaji_title, episodes, status, startdate, enddate, image, synopsis, type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """,(str(id), str(title), str(english_title), str(romaji_title), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype)))
             
