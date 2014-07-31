@@ -147,7 +147,6 @@ def hummingupdate():
     cur.execute("select max(hbid) from maldata")
     max = cur.fetchone()
     max = max[0] + 1
-    print max
     for n in range(max, max + 5):
         hummingget(str(n))
         
