@@ -12,16 +12,18 @@ cur = db.cursor()
 def hummingget(start, finish):
         
     for i in range(start,finish):
+        status = 3
     
         response = Unirest.get("https://vikhyat-hummingbird-v2.p.mashape.com/anime/" + str(i),
         headers={"X-Mashape-Key": "XrBhpdN9HFmshrHK2eOHy3bwyQ9Op1UuTmzjsnbXhNt6OiTYLL"}
         )
         d = response.raw_body
-        status = 3 
-        
-        id = re.search('id":([^,]*)', d)
+                
+        id = re.search('id":(\d+),', d)
         if id:
             id = id.group(1)
+        else:
+            id = None
                     
         title = re.search(r'canonical_title":"([^"]*)', d)
         if title:
@@ -40,6 +42,12 @@ def hummingget(start, finish):
             romaji_title = romaji_title.group(1)
         else:
             romaji_title = ""
+            
+        slug = re.search('"slug":"([^"]*)', d)
+        if slug:
+            slug = slug.group(1)
+        else:
+            slug = ""
             
         synopsis = re.search('"synopsis":"(.*?)","', d)
         if synopsis:
@@ -78,7 +86,7 @@ def hummingget(start, finish):
         if episode_count:
             episode_count = episode_count.group(1)
         else:
-            episode_count = ""
+            episode_count = 0
             
         poster_image = re.search('poster_image":"([^"]*?)"', d)
         if poster_image:
@@ -86,18 +94,24 @@ def hummingget(start, finish):
         else:
             poster_image = ""
         
-        if id:
+        if isinstance(id, (int, str)):
+            
             db.query("""select hbid from malData where hbid = """ + id)
             r = db.store_result()
             r = str(r.fetch_row())
-            r = re.search('\(\((\d+)\D*', r).group(1)
-            if type(id) == "Str": 
-                if r != id:       
-                    cur.execute("""
-                        INSERT INTO malData (hbID, title, english_title, romaji_title, episodes, status, startdate, enddate, image, synopsis, type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """,(str(id), str(title), str(english_title), str(romaji_title), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype)))
-        
-        
-                    db.commit()
+            r = re.search('\(\((\d+)\D*', r)
+            if r:
+                r = r.group(1)
             
-                    print id + ", " + i
+             
+            if r != id:       
+                cur.execute("""
+                    INSERT INTO malData (hbID, title, english_title, romaji_title, slug, episodes, status, startdate, enddate, image, synopsis, type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """,(str(id), str(title), str(english_title), str(romaji_title), str(slug), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype)))
+        
+        
+                db.commit()
+
+                print id + " " + title + " " + slug
+        else:
+            print "no data"
 hummingget(1,50000)
