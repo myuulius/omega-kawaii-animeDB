@@ -2,10 +2,11 @@ import Unirest
 import re
 import MySQLdb
 
-db = MySQLdb.connect(host="localhost", # your host, usually localhost
-                     user="user", # your username
-                      passwd="passwd", # your password
-                      db="hbdb") # name of the data base
+
+db = MySQLdb.connect(host="host",
+                     user="user",
+                      passwd="passwd"
+                      db="hbdb")
 cur = db.cursor()
 
 def hummingget(urlid, mode):
@@ -92,7 +93,7 @@ def hummingget(urlid, mode):
     else:
         poster_image = ""
 
-    if mode == new_anime:
+    if mode == "new_anime":
         if isinstance(id, (int, str)):
 
             db.query("""select hbid from malData where hbid = """ + id)
@@ -108,21 +109,21 @@ def hummingget(urlid, mode):
                     INSERT INTO malData (hbID, title, english_title, romaji_title, slug, episodes, status, startdate, enddate, image, synopsis, type) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) """,(str(id), str(title), str(english_title), str(romaji_title), str(slug), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype)))
 
 
-                #db.commit()
+                db.commit()
 
                 print id + " " + title + " " + slug
         else:
-            print "no data"
+            print "no data at " + str(urlid)
             
-    elif mode == update:
-        updatesql = """ update maldata 
-        set title = %s, english_title = %s, romaji_title = %s, slug = %s, episodes = %s, status = %s, startdate = %s, enddate = %s, image = %s, synopsis = %s, type = %s 
-        where hbid = %s """
-        cur.execute(updatesql, (str(english_title), str(romaji_title), str(slug), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype), (str(id))) ) 
+    if mode == 'update':
+        cur.execute(""" update maldata set title=%s, english_title=%s, romaji_title=%s, slug=%s, episodes=%s, status=%s, startdate=%s, enddate=%s, image=%s, synopsis=%s, type=%s where hbid=%s""", (str(title), str(english_title), str(romaji_title), str(slug), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype), str(id) ) ) 
+        #cur.execute(updatesql, (str(english_title), str(romaji_title), str(slug), str(episode_count), str(status), (started_airing if started_airing != "" else None), (finished_airing if finished_airing != "" else None), str(poster_image), str(synopsis), str(animetype), str(id) ) ) 
                
-        #db.commit()
+        db.commit()
         
-        print  title + " at " + id + " updated"
+        if id:
+            if title:
+                print  title + " at " + id + " updated"
                         
 
 #get all anime, takes some time, around 8400 titles as of 2014-07-31
@@ -145,22 +146,16 @@ def hummingcheck():
     missing_anime = set(range(1, max - 1)).difference(set(nums))
 
     for n in missing_anime:
-        hummingget(str(n), new_anime)
-
-# Checks Hummingbird API for missing anime in the gaps
-#hummingcheck()
+        hummingget(str(n), 'new_anime')
 
 
-
-def hummingupdate():
+def hummingupdate(m):
     cur.execute("select max(hbid) from maldata")
     max = cur.fetchone()
     max = max[0] + 1
-    for n in range(max, max + 5):
-        hummingget(str(n), new_anime)
+    for n in range(max, max + m):
+        hummingget(str(n), 'new_anime')
         
-# Checks Hummingbird API for 5 new shows after the max    
-#hummingupdate()
 
 def anime_search(search_term):
     search_sql = "%" + re.sub("[^\w^!^@^\*]", "%", search_term) + "%"
@@ -169,11 +164,9 @@ def anime_search(search_term):
     response = cur.fetchall()
     print response
 
-#Searches the database for a given string
-#anime_search("Baccano,!")
-
 def update_anime():
     cur.execute("select hbid from maldata where status < 2")
     animenf = cur.fetchall()
     for i in animenf:
-        hummingget(i, update)
+        url = str(i[0])
+        hummingget(url, 'update')
