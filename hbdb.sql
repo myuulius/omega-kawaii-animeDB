@@ -34,7 +34,7 @@ ENGINE = InnoDB;
 -- Table `hbdb`.`watching`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hbdb`.`watching` (
-  `malID` INT NULL,
+  `hbID` INT NULL,
   `Folder` VARCHAR(80) NULL,
   `PrefTitle` VARCHAR(80) NULL,
   `Progress` INT NULL,
@@ -51,7 +51,7 @@ ENGINE = InnoDB;
 -- Table `hbdb`.`archived`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hbdb`.`archived` (
-  `malID` INT NULL,
+  `hbID` INT NULL,
   `Folder` VARCHAR(80) NULL,
   `PrefTitle` VARCHAR(80) NULL,
   INDEX `fk_archived_malData_idx` (`malID` ASC),
@@ -80,7 +80,7 @@ ENGINE = InnoDB;
 -- Table `hbdb`.`anime`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hbdb`.`episodes` (
-  `malID` INT NULL,
+  `hbID` INT NULL,
   `episode_number` INT NULL,
   `v` INT NULL,
   `date_aired` DATETIME NULL,
