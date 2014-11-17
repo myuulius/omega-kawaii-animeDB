@@ -40,11 +40,11 @@ namespace kawaii_animedb
         public static string RequestUrl = "https://vikhyat-hummingbird-v2.p.mashape.com/anime/1";
         public static string Key = "XrBhpdN9HFmshrHK2eOHy3bwyQ9Op1UuTmzjsnbXhNt6OiTYLL";
 
-        Database database;
+        
         OutputBox outputter;
-        ListviewPopulate populate;
-        API api;
-
+        
+        //API api;
+        //Database database;
         public MainWindow()
         {
             InitializeComponent();
@@ -58,29 +58,22 @@ namespace kawaii_animedb
             outputter = new OutputBox(Output);
             Console.SetOut(outputter);
             Console.WriteLine("Working!");
-            /*
-            string sql = "create if table not exists anime (id INTEGER PRIMARY KEY, title VARCHAR(255), english_title VARCHAR(255), romaji_title VARCHAR(255), episodes INTEGER, status INTEGER, startdate DATE, enddate DATE, image VARCHAR(140), synopsis VARCHAR(5000), type VARCHAR(10), prefgroup INTEGER); "
-                    + "create if table not exists watching (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80), progress INTEGER); " + "create if table not exists archived (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80)); "
-                    + "create if table not exists subgroups (groupid INTEGER PRIMARY KEY, groupname VARCHAR(80), isjoint BOOLEAN, priority SMALLINT, website VARCHAR(120)); "
-                    + "create if table not exists episodes (id INTEGER, episodeNumber INTEGER, version INTEGER, dateaired DATE, datedownloaded DATE, groupid INTEGER, isBD BOOLEAN, crc CHAR(8), epname VARCHAR(255));";
-
-            Console.WriteLine(sql);
-             */
-            
-            //database.CreateAnimeDatabase();
+           
+            Database database = new Database();
+            database.CreateAnimeDatabase();
         }
 
             
         public void PageLoaded(object sender, RoutedEventArgs e)
         {
             
+            API api = new API();
+            //api.GetAPIData(Key, RequestUrl);
             
-            api.GetAPIData(Key, RequestUrl);
-
             //Populate Folders List
-            populate.PopulateLists();
 
-            
+            ListviewPopulate populate = new ListviewPopulate();
+            populate.PopulateLists(this);
 
 
         }
@@ -113,12 +106,11 @@ namespace kawaii_animedb
             {
                 sValue = (String)archiveList.SelectedItem.ToString();
             }
-
-            populate.AnimeDetails(sender, sValue);
+            ListviewPopulate populate = new ListviewPopulate();
+            populate.AnimeDetails(this, sender, sValue);
 
         }
-
-
+        
     }
     
 }
