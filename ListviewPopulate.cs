@@ -15,14 +15,13 @@ namespace kawaii_animedb
     
     class ListviewPopulate
     {
-        Database database;
-        MainWindow mainwindow;
 
         public static string DownloadsDir = "F:\\Downloads\\completed\\anime";
         public static string AnimeDir = "Z:\\";
 
-        public void PopulateLists()
+        public void PopulateLists(MainWindow mainwindow)
         {
+            
             string[] dirs = Directory.GetDirectories(AnimeDir);
             foreach (string dir in dirs)
                 mainwindow.folderList.Items.Add(dir.Substring(3));
@@ -32,42 +31,43 @@ namespace kawaii_animedb
             foreach (string dirw in dirsw)
                 mainwindow.watchingList.Items.Add(dirw.Substring(29));
 
-
-
+            
             //Populate Archive List
-            string query = "select anime.hbid, title, image from anime join archived ON anime.hbID=archived.hbid";
-            SQLiteDataReader rdr = database.GetData(query);
+            string query = "select folder from archived";
+            Database database = new Database();
+            SQLiteDataReader rdr3 = database.GetData(query);
 
-            while (rdr.Read())
+            while (rdr3.Read())
             {
-                mainwindow.archiveList.Items.Add(rdr.GetString(1));
+                mainwindow.archiveList.Items.Add(rdr3.GetString(0));
             }
-
-            rdr.Close();
+            rdr3.Close();
 
             //Populate Watching List
-            string query2 = "select anime.hbid, title, image from anime join watching ON anime.hbID=watching.hbid";
+            /*string query2 = "select anime.id, title, image from anime join watching ON anime.id=watching.id";
             SQLiteDataReader rdr2 = database.GetData(query2);
             while (rdr2.Read())
             {
                 mainwindow.watchingList.Items.Add(rdr2.GetString(1));
-            }
+            }*/
         }
 
-        public void AnimeDetails(Object sender, string sValue)
+        public void AnimeDetails(MainWindow mainwindow, Object sender, string sValue)
         {
-            BitmapSource poster = null;
+            // Populate Details Pane
+            string status = "";
+            string posterurl = "";
             string folder = "";
             string id = "";
             string animeDetailsContent = "";
-            string query = "select image, title, english_title, romaji_title, episodes, status, synopsis, type, folder, id from anime join archived on anime.hbid=archived.hbid where anime.title = \"" + sValue + "\"";
-
+            string query = "select image, title, english_title, romaji_title, episodes, status, synopsis, type, folder, anime.id from anime inner join archived on anime.id=archived.id where anime.title = \"" + sValue + "\"";
+            Database database = new Database();
             SQLiteDataReader rdr = database.GetData(query);
 
 
             while (rdr.Read())
             {
-                string status = rdr.GetString(5);
+                status = rdr.GetInt32(5).ToString();
                 if (status == "0")
                 {
                     status = "Not Yet Aired";
@@ -89,16 +89,15 @@ namespace kawaii_animedb
                     "\nRomaji Title: " + rdr.GetString(3) +
                     "\nStatus: " + status +
                     "\nType: " + rdr.GetString(7) +
-                    "\nNumber of Episodes: " + rdr.GetString(4) +
+                    "\nNumber of Episodes: " + rdr.GetInt32(4).ToString() +
                     "\nSynopsis: " + rdr.GetString(6);
                 folder = rdr.GetString(8);
-                id = rdr.GetString(9);
+                id = rdr.GetInt32(9).ToString();
+                posterurl = rdr.GetString(0);
             }
 
             mainwindow.episodeList.Items.Clear();
             ListView listview = (ListView)sender;
-
-
 
             string[] files = Directory.GetFiles(AnimeDir + folder);
             foreach (string file in files)
@@ -106,19 +105,25 @@ namespace kawaii_animedb
 
             mainwindow.animeDetails.Text = animeDetailsContent;
 
-            string posterpath = "/Posters/" + id;
-            //string posterpath = "Posters\\" + rdr.GetString(9);
-            if (File.Exists(posterpath))
+
+            // Set poster image (not working correctly)
+            string posterpath = "Posters\\" + id + ".jpg";
+            if (!File.Exists(posterpath))
             {
-                mainwindow.animePoster.Source = new BitmapImage(new Uri(posterpath));
+                Console.WriteLine("Poster doesn't exist, downloading...");
+                WebClient webClient = new WebClient();
+                webClient.DownloadFile(posterurl, posterpath);
+                Console.WriteLine("Poster downloaded.");
             }
             else
             {
-                //poster = GetImageFromUrl(rdr.GetString(0));
-                WebClient webClient = new WebClient();
-                webClient.DownloadFile(id, posterpath);
-                mainwindow.animePoster.Source = poster;
+                Console.WriteLine("Poster already exists.");
             }
+            
+            Uri uri = new Uri(posterpath, UriKind.RelativeOrAbsolute);
+            BitmapImage bitmap = new BitmapImage(uri);
+            mainwindow.animePoster.Source = bitmap;
+            
 
 
             rdr.Close();
