@@ -36,8 +36,8 @@ namespace kawaii_animedb
             sqlite_cmd = sqlite_conn.CreateCommand();
             sqlite_cmd.CommandText = query;
             sqlite_datareader = sqlite_cmd.ExecuteReader();
-            sqlite_conn.Close();
             return sqlite_datareader;
+            //sqlite_conn.Close();
         }
 
         public void CreateAnimeDatabase()
@@ -46,12 +46,14 @@ namespace kawaii_animedb
             {
                 SQLiteConnection.CreateFile("animedata.sqlite");
 
-                string sql = "create if table not exists anime (id INTEGER PRIMARY KEY, title VARCHAR(255), english_title VARCHAR(255), romaji_title VARCHAR(255), episodes INTEGER, status INTEGER, startdate DATE, enddate DATE, image VARCHAR(140), synopsis VARCHAR(5000), type VARCHAR(10), prefgroup INTEGER); "
-                    + "create if table not exists watching (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80), progress INTEGER); " + "create if table not exists archived (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80)); "
-                    + "create if table not exists subgroups (groupid INTEGER PRIMARY KEY, groupname VARCHAR(80), isjoint BOOLEAN, priority SMALLINT, website VARCHAR(120)); "
-                    + "create if table not exists episodes (id INTEGER, episodeNumber INTEGER, version INTEGER, dateaired DATE, datedownloaded DATE, groupid INTEGER, isBD BOOLEAN, crc CHAR(8), epname VARCHAR(255));";
+                string sql = "create table anime (id INTEGER PRIMARY KEY, title VARCHAR(255), english_title VARCHAR(255), romaji_title VARCHAR(255), episodes INTEGER, status INTEGER, startdate VARCHAR(30), enddate VARCHAR(30), image VARCHAR(140), synopsis VARCHAR(5000), type VARCHAR(10), prefgroup INTEGER); "
+                    + "create table watching (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80), progress INTEGER); " + "create table archived (id INTEGER, folder VARCHAR(80), preftitle VARCHAR(80)); "
+                    + "create table subgroups (groupid INTEGER PRIMARY KEY, groupname VARCHAR(80), isjoint BOOLEAN, priority SMALLINT, website VARCHAR(120)); "
+                    + "create table episodes (id INTEGER, episodeNumber INTEGER, version INTEGER, dateaired DATE, datedownloaded DATE, groupid INTEGER, isBD BOOLEAN, crc CHAR(8), epname VARCHAR(255));";
                 
                 ExecuteQuery(sql);
+                
+                
                 Console.WriteLine("DB Created.");
             }
             else
