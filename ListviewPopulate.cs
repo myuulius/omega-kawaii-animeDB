@@ -16,8 +16,8 @@ namespace kawaii_animedb
     class ListviewPopulate
     {
 
-        public static string DownloadsDir = "F:\\Downloads\\completed\\anime";
-        public static string AnimeDir = "Z:\\";
+        public static string DownloadsDir = MainWindow.DownloadsDir;
+        public static string AnimeDir = MainWindow.AnimeDir;
 
         public void PopulateLists(MainWindow mainwindow)
         {
@@ -123,13 +123,8 @@ namespace kawaii_animedb
             Uri uri = new Uri(posterpath, UriKind.RelativeOrAbsolute);
             BitmapImage bitmap = new BitmapImage(uri);
             mainwindow.animePoster.Source = bitmap;
-            
-
 
             rdr.Close();
         }
-
-
-
     }
 }
