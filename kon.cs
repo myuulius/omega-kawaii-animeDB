@@ -37,14 +37,12 @@ namespace kawaii_animedb
         public static string ImageFolder = "Posters";
         public static string DownloadsDir = "F:\\Downloads\\completed\\anime";
         public static string AnimeDir = "Z:\\";
-        public static string RequestUrl = "https://vikhyat-hummingbird-v2.p.mashape.com/anime/1";
-        public static string Key = "XrBhpdN9HFmshrHK2eOHy3bwyQ9Op1UuTmzjsnbXhNt6OiTYLL";
+        public static string RequestUrl = "https://hummingbird.me/api/v2/anime/";
+        public static string Key = "redacted";
 
         
         OutputBox outputter;
         
-        //API api;
-        //Database database;
         public MainWindow()
         {
             InitializeComponent();
@@ -67,15 +65,12 @@ namespace kawaii_animedb
         public void PageLoaded(object sender, RoutedEventArgs e)
         {
             
-            API api = new API();
-            //api.GetAPIData(Key, RequestUrl);
-            
             //Populate Folders List
-
             ListviewPopulate populate = new ListviewPopulate();
             populate.PopulateLists(this);
 
-
+            Database db = new Database();
+            db.FillDatabase();
         }
 
         public void SelectAnimeFromListFolders(Object sender, SelectionChangedEventArgs e)
@@ -110,6 +105,7 @@ namespace kawaii_animedb
             populate.AnimeDetails(this, sender, sValue);
 
         }
+        
         
     }
     
