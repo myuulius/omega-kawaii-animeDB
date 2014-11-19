@@ -55,6 +55,7 @@ namespace kawaii_animedb
                 
                 
                 Console.WriteLine("DB Created.");
+
             }
             else
             {
@@ -76,5 +77,39 @@ namespace kawaii_animedb
                 }
             }
         }
+
+        public async void FillDatabase()
+        {
+            int maxid = 1;
+            SQLiteDataReader rdr = GetData("select max(id) from anime");
+            while (rdr.Read())
+            {
+                maxid = rdr.GetInt32(0);
+            }
+            int count = 0;
+            int id = maxid + 1;
+            while (count < 10)
+            {
+                API api = new API();
+                Anime anime = new Anime();
+                anime = api.GetAPIData(id, anime);
+                if (anime != null)
+                {
+                    string sql = "insert into anime values (" + id + ", \"" + anime.title_canonical + "\", \"" + anime.title_english + "\", \"" + anime.title_romaji + "\", " + anime.episode_count + ", \"" + anime.status + "\", \"" + anime.started_airing + "\", \"" + anime.finished_airing + "\", \"" + anime.poster_image + "\", \"" + anime.synopsis + "\", \"" + anime.show_type + "\", \"\"" + ")";
+                    Console.WriteLine(sql);
+                    ExecuteQuery(sql);
+                    count = 0;
+                    //count++;
+                }
+                else
+                {
+                    count++;
+                }
+                id++;
+            }
+            Console.WriteLine("Reached 10 consecutive empty entries.");
+            await Task.Delay(1000);
+        }
+
     }
 }
