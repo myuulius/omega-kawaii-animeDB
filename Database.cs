@@ -78,13 +78,23 @@ namespace kawaii_animedb
             }
         }
 
-        public async void FillDatabase()
+        public void FillDatabase()
         {
-            int maxid = 1;
+            int maxid = 0;
             SQLiteDataReader rdr = GetData("select max(id) from anime");
             while (rdr.Read())
             {
-                maxid = rdr.GetInt32(0);
+                try
+                {
+                    if (rdr.GetInt32(0) > 0)
+                    {
+                        maxid = rdr.GetInt32(0);
+                    }
+                }
+                catch
+                {
+                    
+                }
             }
             int count = 0;
             int id = maxid + 1;
@@ -95,11 +105,9 @@ namespace kawaii_animedb
                 anime = api.GetAPIData(id, anime);
                 if (anime != null)
                 {
-                    string sql = "insert into anime values (" + id + ", \"" + anime.title_canonical + "\", \"" + anime.title_english + "\", \"" + anime.title_romaji + "\", " + anime.episode_count + ", \"" + anime.status + "\", \"" + anime.started_airing + "\", \"" + anime.finished_airing + "\", \"" + anime.poster_image + "\", \"" + anime.synopsis + "\", \"" + anime.show_type + "\", \"\"" + ")";
-                    Console.WriteLine(sql);
+                    string sql = "insert into anime values (" + id + ", \"" + anime.title_canonical + "\", \"" + anime.title_english + "\", \"" + anime.title_romaji + "\", " + anime.episode_count + ", " + anime.status + ", \"" + anime.started_airing + "\", \"" + anime.finished_airing + "\", \"" + anime.poster_image + "\", \"" + anime.synopsis + "\", \"" + anime.show_type + "\", \"\"" + ")";
                     ExecuteQuery(sql);
                     count = 0;
-                    //count++;
                 }
                 else
                 {
@@ -108,7 +116,6 @@ namespace kawaii_animedb
                 id++;
             }
             Console.WriteLine("Reached 10 consecutive empty entries.");
-            await Task.Delay(1000);
         }
 
     }
