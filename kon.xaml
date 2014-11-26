@@ -5,9 +5,6 @@
         xmlns:local="clr-namespace:kawaii_animedb" xmlns:IO="clr-namespace:System.IO;assembly=System" x:Class="kawaii_animedb.MainWindow"
         Title="Kon" Height="1033" Width="1880">
     <Window.Resources>
-        
-
-        
     </Window.Resources>
 
     <Grid >
@@ -75,10 +72,10 @@
         <ToolBarTray HorizontalAlignment="Left" Height="44" Margin="10,10,0,0" VerticalAlignment="Top" Width="1852" Grid.ColumnSpan="4">
             <ToolBar Band="0" BandIndex="0">
                 <TextBlock Margin="0,0,9,0" Text="Open:" />
-
             </ToolBar>
         </ToolBarTray>
         <TextBox x:Name="Output" Grid.Column="3" Margin="10" Grid.Row="4" TextWrapping="Wrap"/>
-
+        <Button Content="Update Database" HorizontalAlignment="Left" Margin="103,9,0,0" VerticalAlignment="Top" Width="103" Click="dbFill_Click"/>
+        <Button Content="Cancel database stuff" HorizontalAlignment="Left" Margin="211,10,0,0" VerticalAlignment="Top" Width="128" Click="buttonCancel_Click" ToolTip="Doesn't work (/ω＼)"/>
     </Grid>
 </Window>
