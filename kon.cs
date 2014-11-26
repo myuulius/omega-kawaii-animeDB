@@ -40,14 +40,20 @@ namespace kawaii_animedb
         public static string RequestUrl = "https://hummingbird.me/api/v2/anime/";
         public static string Key = "redacted";
 
-        
+        BackgroundWorker dbFill = new BackgroundWorker();
         OutputBox outputter;
         
+        //API api;
+        //Database database;
         public MainWindow()
         {
             InitializeComponent();
 
             Loaded += PageLoaded;
+
+            dbFill.WorkerSupportsCancellation = true;
+            dbFill.DoWork += new DoWorkEventHandler(bw_DBFill);
+            dbFill.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_DBFillCompleted);
             
             
             if (!Directory.Exists(ImageFolder))
@@ -69,8 +75,7 @@ namespace kawaii_animedb
             ListviewPopulate populate = new ListviewPopulate();
             populate.PopulateLists(this);
 
-            Database db = new Database();
-            db.FillDatabase();
+            
         }
 
         public void SelectAnimeFromListFolders(Object sender, SelectionChangedEventArgs e)
@@ -105,7 +110,45 @@ namespace kawaii_animedb
             populate.AnimeDetails(this, sender, sValue);
 
         }
-        
+
+        private void dbFill_Click(object sender, RoutedEventArgs e)
+        {
+            if (dbFill.IsBusy != true)
+            {
+                dbFill.RunWorkerAsync();
+            }
+        }
+
+        private void bw_DBFill(object sender, DoWorkEventArgs e)
+        {
+            Database db = new Database();
+            db.FillDatabase();
+        }
+
+        private void bw_DBFillCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if ((e.Cancelled == true))
+            {
+                Console.WriteLine("Database operation cancelled.");
+            }
+            else if (!(e.Error == null))
+            {
+                Console.WriteLine("Error: " + e.Error.Message);
+            }
+            else
+            {
+                Console.WriteLine("Database operation completed.");
+            }
+        }
+
+        //This doesn't work, need to pass the cancellation to the while loop in db.FillDatabase()
+        private void buttonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            if (dbFill.WorkerSupportsCancellation == true)
+            {
+                dbFill.CancelAsync();
+            }
+        }
         
     }
     
