@@ -17,7 +17,7 @@ namespace kawaii_animedb
         public string synopsis;
         public string started_airing;
         public string finished_airing;
-        public string status;
+        public Int32 status;
         public string show_type;
         public int episode_count;
         public List<System.Object> genres;
@@ -25,11 +25,5 @@ namespace kawaii_animedb
 
         public string poster_image;
         public string youtube_link;
-
-        public bool GetStatus()
-        {
-            return false;
-        }
-        
     }
 }
