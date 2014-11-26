@@ -18,10 +18,9 @@ namespace kawaii_animedb
             unirest_net.http.HttpResponse<string> request = unirest_net.http.Unirest.get(RequestUrl).header("X-Client-Id", MainWindow.Key).asString();
             string apibody = request.Body;
             
-            Console.WriteLine(request.Code);
             if (request.Code != 200)
             {
-                return anime;
+                return null;
             }
             
             var json = JsonParser.Deserialize(apibody);
@@ -47,24 +46,20 @@ namespace kawaii_animedb
 
             if (json.anime.finished_airing_date != null)
             {
-                anime.status = "Finished Airing";
+                anime.status = 2;
             }
-            else
+            else if (json.anime.started_airing_date != null)
             {
-                if (json.anime.started_airing_date != null)
+                if (anime.show_type != "TV")
                 {
-                    if (anime.show_type != "TV")
-                    {
-                        anime.status = "Finished Airing";
-                    }
+                        anime.status = 2;
                 }
                 else
                 {
-                    anime.status = "Not Yet Aired";
+                    anime.status = 1;
                 }
             }
-            Console.WriteLine(anime.status);
-            
+
             return anime;
         }
 
